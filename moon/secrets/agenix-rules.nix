@@ -1,8 +1,7 @@
 let
-  system = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOhZPaGoMdsFWKJAOtFm6YnPRv5dg1sdbiMgZxdma9+S";
+  host = builtins.readFile ../host_keys/ssh_host_ed25519_key.pub;
 in {
-  "authentik_env.age".publicKeys = [ system ];
-  "caddy_env.age".publicKeys = [ system ];
-  "cf_api_token.age".publicKeys = [ system ];
-  "forgejo_env.age".publicKeys = [ system ];
+  "authentik_env.age".publicKeys = [ host ];
+  "caddy_env.age".publicKeys = [ host ];
+  "cf_api_token.age".publicKeys = [ host ];
 }

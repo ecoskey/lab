@@ -44,13 +44,17 @@
     };
 
     apps = {
-      vm-moon = mkVM "moon";
+      moon_vm = mkVM "moon";
     };
 
     devShells.${system} = {
       default = pkgs.mkShellNoCC {
         QEMU_NET_OPTS = "hostfwd=tcp::2221-:22";
-        packages = [ agenix.packages.${system}.default ];
+        NIX_SSHOPTS = "-i ~/.ssh/lab_key";
+        packages = [ 
+          agenix.packages.${system}.default
+          pkgs.nixos-anywhere
+        ];
       };
     };
   };

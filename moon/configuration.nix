@@ -4,10 +4,12 @@
     inputs.authentik.nixosModules.default
     inputs.disko.nixosModules.default
 
-    ../base/system.nix
+    ../base/configuration.nix
     ./hardware-configuration.nix
     ./disk-config.nix
   ];
+
+  base_dir = ./.;
 
   networking.hostName = "moon";
 
@@ -92,8 +94,7 @@
       settings = {
         server = {
           DOMAIN = "git.lupine.computer";
-          # You need to specify this to remove the port from URLs in the web UI.
-          ROOT_URL = "https://git.lupine.computer/"; 
+          ROOT_URL = "https://git.lupine.computer/";
           HTTP_PORT = 3000;
         };
 
