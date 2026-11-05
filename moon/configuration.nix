@@ -69,18 +69,16 @@
 
     authentik = {
       enable = true;
-      # The environmentFile needs to be on the target host!
-      # Best use something like sops-nix or agenix to manage it
       environmentFile = config.age.secrets.authentik_env.path;
       settings = {
-        # email = {
-        #   host = "smtp.example.com";
-        #   port = 587;
-        #   username = "authentik@example.com";
-        #   use_tls = true;
-        #   use_ssl = false;
-        #   from = "authentik@example.com";
-        # };
+        email = {
+          host = "smtp.protonmail.ch";
+          port = 587;
+          username = "auth@lupine.computer";
+          use_tls = true;
+          use_ssl = false;
+          from = "auth@lupine.computer";
+        };
         disable_startup_analytics = true;
         avatars = "initials";
       };
