@@ -9,14 +9,13 @@
     ./disk-config.nix
   ];
 
-  base_dir = ./.;
-
   networking.hostName = "moon";
 
   age.secrets = {
     authentik_env.file = ./secrets/authentik_env.age;
     caddy_env.file = ./secrets/caddy_env.age;
     cf_api_token.file = ./secrets/cf_api_token.age;
+    forgejo_smtp_passwd.file = ./secrets/forgejo_smtp_passwd.age;
   };
 
   services = {
@@ -48,22 +47,27 @@
       };
       environmentFile = config.age.secrets.caddy_env.path;
       virtualHosts = {
-        "*.lupine.computer".extraConfig = ''
-          tls {
-            dns cloudflare {env.CF_API_TOKEN}
-            resolvers 1.1.1.1
-          }
+        "*.lupine.computer" = {
+          listenAddresses = [ "10.0.20.0/24" ];
+          extraConfig = ''
+            tls {
+              dns cloudflare {env.CF_API_TOKEN}
+              resolvers 1.1.1.1
+            }
 
-          @home host home.lupine.computer
-          @auth host auth.lupine.computer
-          @git host git.lupine.computer
+            @home host home.lupine.computer
+            @auth host auth.lupine.computer
+            @git host git.lupine.computer
+            @vpn host vpn.lupine.computer
 
-          reverse_proxy @home http://10.0.3.3
-          reverse_proxy @auth http://127.0.0.1:9000
-          reverse_proxy @git http://127.0.0.1:3000 {
-            header_up X-Real-IP {remote_host}
-          }
-        '';
+            reverse_proxy @home http://10.0.3.3
+            reverse_proxy @auth http://127.0.0.1:9000
+            reverse_proxy @git http://127.0.0.1:3000 {
+              header_up X-Real-IP {remote_host}
+            }
+            reverse_proxy @vpn http://127.0.0.1:4000
+          '';
+        };
       };
     };
 
@@ -84,6 +88,7 @@
       };
     };
 
+    openssh.settings.Allow = [ "forgejo" ];
     forgejo = {
       enable = true;
       database.type = "postgres";
@@ -100,6 +105,15 @@
           ENABLE_AUTO_REGISTRATION = true;
         };
 
+        mailer = {
+          ENABLED = true;
+          FROM = "git@lupine.computer";
+          PROTOCOL = "smtp";
+          SMTP_ADDR = "smtp.protonmail.ch";
+          SMTP_PORT = 587;
+          USER = "git@lupine.computer";
+        };
+
         # You can temporarily allow registration to create an admin user.
         service.DISABLE_REGISTRATION = true;
         # Add support for actions, based on act: https://github.com/nektos/act
@@ -109,6 +123,14 @@
         };
       };
     };
+
+    # headscale = {
+    #   enable = true;
+    #   port = 4000;
+    #   settings = {
+    #     server_url = "https://vpn.lupine.computer";
+    #   };
+    # };
   };
 
   # DO NOT EDIT !!!
