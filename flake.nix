@@ -31,51 +31,24 @@
       config.allowUnfree = true;
     };
 
-    # Create a VM app from a nixos config
-    mkVM = name: {
-      type = "app";
-      # program = "${self.nixosConfigurations.${name}.config.system.build.vm}/bin/run-${name}-vm";
-      program = "${pkgs.nixos-anywhere}/bin/nixos-anywhere --flake ${self}#${name} --extra-files ${self}/${name}/extra_files --vm-test" ;
-    };
-
-    mkDeploy = name: {
-      type = "app";
-      program = "${pkgs.nixos-anywhere}/bin/nixos-anywhere --flake ${self}#${name} -i ~/.ssh/lab_key --extra-files ${self}/${name}/extra_files --generate-hardware-config nixos-generate-config ${./${name}/hardware-configuration.nix} --target-host" ;
-    };
-
-    mkSwitch = name: {
-      type = "app";
-      program = "nixos-rebuild switch --flake ${self}#${name} --ask-sudo-password --target-host";
+    mkSystem = host: nixpkgs.lib.nixosSystem {
+      inherit system pkgs;
+      modules = [ ./${host}/configuration.nix ];
+      specialArgs = { inherit inputs pkgs_unstable; };
     };
   in {
-    nixosConfigurations.moon = nixpkgs.lib.nixosSystem {
-      inherit system pkgs;
-      modules = [ ./moon/configuration.nix ];
-      specialArgs = { inherit inputs pkgs_unstable; };
-    };
-
-    nixosConfigurations.pebbles = nixpkgs.lib.nixosSystem {
-      inherit system pkgs;
-      modules = [ ./pebbles/configuration.nix ];
-      specialArgs = { inherit inputs pkgs_unstable; };
-    };
-
-    apps = {
-      moon_vm = mkVM "moon";
-      moon_deploy = mkDeploy "moon";
-      moon_switch = mkSwitch "moon";
-      pebbles_vm = mkVM "pebbles";
-      pebbles_deploy = mkDeploy "pebbles";
-      pebbles_switch = mkSwitch "pebbles";
+    nixosConfigurations = {
+      moon = mkSystem "moon";
+      pebbles = mkSystem "pebbles";
     };
 
     devShells.${system} = {
       default = pkgs.mkShellNoCC {
         QEMU_NET_OPTS = "hostfwd=tcp::2221-:22";
-        NIX_SSHOPTS = "-i ~/.ssh/lab_key";
-        packages = [ 
+        packages = [
           agenix.packages.${system}.default
           pkgs.nixos-anywhere
+          pkgs.just
         ];
       };
     };

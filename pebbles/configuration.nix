@@ -14,7 +14,18 @@
   hardware.nvidia.open = true;  # see the note above
 
   # User for steamos autologin. Not a member of @wheel
-  users.users."gamer" = { };
+  users.users."gamer" = {
+    isNormalUser = true;
+  };
+
+  boot = {
+    kernelParams = [
+      "quiet"
+      "splash"
+      "console=/dev/null"
+    ];
+    plymouth.enable = true;
+  };
 
   services = {
     avahi = {
