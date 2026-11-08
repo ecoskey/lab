@@ -3,11 +3,11 @@ vm HOST:
     nix run {{justfile_directory()}}#nixosConfigurations.{{HOST}}.config.system.build.vm
 
 # Initialize a remote host using nixos-anywhere
-deploy HOST REMOTE: 
-    NIX_SSHOPTS="-i ~/.ssh/lab_key";
+deploy HOST REMOTE:
+    # NIX_SSHOPTS="-i ~/.ssh/lab_key";
     cd {{justfile_directory()}}
-    mkdir -p target/{{HOST}}/etc/
-    cp -r {{HOST}}/host_keys/ target/{{HOST}}/etc/ssh
+    mkdir -p target/{{HOST}}/etc/ssh
+    cp {{HOST}}/host_keys/** target/{{HOST}}/etc/ssh/
     nixos-anywhere --flake .#{{HOST}} --extra-files target/{{HOST}} --generate-hardware-config nixos-generate-config {{HOST}}/hardware-configuration.nix --target-host {{REMOTE}}
     rm -r target
 

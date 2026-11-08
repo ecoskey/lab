@@ -88,7 +88,7 @@
       };
     };
 
-    # openssh.settings.AllowUsers = [ "forgejo" ];
+    openssh.settings.Allow = [ "forgejo" ];
     forgejo = {
       enable = true;
       database.type = "postgres";

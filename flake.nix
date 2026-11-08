@@ -7,6 +7,10 @@
     nixpkgs_unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     authentik.url = "github:nix-community/authentik-nix";
     agenix.url = "github:ryantm/agenix";
+    jovian = {
+      url = "github:Jovian-Experiments/Jovian-NixOS";
+      # inputs.nixpkgs.follows = "nixpkgs_unstable";
+    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";

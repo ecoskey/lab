@@ -94,7 +94,8 @@
       generateHostKeys = false;
       settings = {
         PasswordAuthentication = false;
-        AllowGroups = [ "local_ssh@10.0.0.0/8" ];
+        # AllowGroups = [ "local_ssh@10.0.0.0/8" ];
+        AllowUsers = [ "emerson" ];
         DisableForwarding = true;
         PermitRootLogin = "no";
       };
